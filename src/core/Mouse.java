@@ -32,6 +32,7 @@ public class Mouse implements GLFWMouseButtonCallbackI {
 		}
 
 		buttons[button] = (action != GLFW_RELEASE);	
+		Cursor.setVisibility(false);
 	}
 	
 	public static boolean isButtonDown(int button) {

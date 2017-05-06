@@ -30,8 +30,12 @@ public class Keyboard implements GLFWKeyCallbackI{
 			keysDown[key] = false;
 			keysUp[key] = true;
 		}
-
+		
 		keys[key] = (action != GLFW_RELEASE);
+		
+		if (isKeyDown(GLFW_KEY_ESCAPE)) {
+			Cursor.setVisibility(true);
+		}
 	}
 	
 	public static boolean isKeyDown(int key) {

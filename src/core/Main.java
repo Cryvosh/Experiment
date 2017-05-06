@@ -19,11 +19,63 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Main {
 	
+	private static int vaoID;
+	
+	private static Camera camera = new Camera(0.0f, 0.0f, 0.0f);
+	
 	public static void main(String[] args) {
+		Window.makeWindow("Experiment", 800, 600);
+		drawQuad();
+        
+		Shader testShader = new Shader("shaders/vertex.shader", "shaders/testMarch.shader");
+		testShader.enable();
 		
-		Window window = new Window("Experiment", 800, 600);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		
+		while(!Window.shouldClose()) {
+			Window.clear();
+	        
+			glBindVertexArray(vaoID);
+		    glEnableVertexAttribArray(0);
+		    glDrawArrays(GL_TRIANGLES, 0, 6);
+		    
+		    camera.setYaw((float)Cursor.getX());
+		    camera.setPitch((float)Cursor.getY());
+		    
+		    if (Keyboard.isKeyPressed(GLFW_KEY_W))
+	        {
+	            camera.moveForwards((float)Window.getDT());
+	        }
+	        if (Keyboard.isKeyPressed(GLFW_KEY_S))
+	        {
+	            camera.moveBackwards((float)Window.getDT());
+	        }
+	        if (Keyboard.isKeyPressed(GLFW_KEY_A))
+	        {
+	            camera.moveLeft((float)Window.getDT());
+	        }
+	        if (Keyboard.isKeyPressed(GLFW_KEY_D))
+	        {
+	            camera.moveRight((float)Window.getDT());
+	        }
+		    
+		    setUniforms(testShader);
+		    
+			if(Mouse.isButtonUp(GLFW_MOUSE_BUTTON_LEFT)) {
+				System.out.println("FPS: " + 1/Window.getDT());
+			}
+			
+			Window.update();
+		}
+	}
+	
+	public static void setUniforms(Shader shader) {
+		shader.setUniform3f("iPosition", camera.getPos().x, camera.getPos().y, camera.getPos().z);
+		shader.setUniform2f("iMouse", (float)Cursor.getX(), (float)Cursor.getY());
+		shader.setUniform1f("iGlobalTime", (float)glfwGetTime());
+		shader.setUniform2f("iResolution", Window.getWidth(), Window.getHeight());
+		shader.setUniform3f("iFront", Cursor.front.x, Cursor.front.y, Cursor.front.z);
+	}
+	
+	public static void drawQuad() {
 		float vertices[] = {
 				 -1.0f, -1.0f, 0.0f,
 				 -1.0f,  1.0f, 0.0f,
@@ -33,7 +85,7 @@ public class Main {
 				 -1.0f, -1.0f, 0.0f,
 		};
 		
-		int vaoID = glGenVertexArrays();
+		vaoID = glGenVertexArrays();
 		glBindVertexArray(vaoID);
 		
 		FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(vertices.length);
@@ -45,28 +97,5 @@ public class Main {
 		
 		glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
 		glBindVertexArray(0);
-        
-		Shader testShader = new Shader("shaders/vertex.shader", "shaders/testMarch.shader");
-		testShader.enable();
-		
-		while(!window.shouldClose()) {
-			window.clear();
-	        
-			glBindVertexArray(vaoID);
-		    glEnableVertexAttribArray(0);
-			
-		    glDrawArrays(GL_TRIANGLES, 0, 6);
-		    testShader.setUniform1f("iGlobalTime", (float)glfwGetTime());
-		    testShader.setUniform2f("iResolution", window.getWidth(), window.getHeight());
-			
-		    glDisableVertexAttribArray(0);
-		    glBindVertexArray(0);
-		    
-			if(Mouse.isButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
-				System.out.println("FPS: " + 1/window.getDT());
-			}
-			
-			window.update();
-		}
 	}
 }

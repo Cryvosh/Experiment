@@ -58,6 +58,10 @@ public class Shader {
 		glUniform2f(getUniform(name), x, y);
 	}
 	
+	public void setUniform3f(String name, float x, float y, float z) {
+		glUniform3f(getUniform(name), x, y, z);
+	}
+	
 	private int load(String vertPath, String fragPath) {		
 		
 		int vertShader = glCreateShader(GL_VERTEX_SHADER);

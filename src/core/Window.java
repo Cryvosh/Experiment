@@ -16,24 +16,24 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Window {
 	
-	private String title;
+	private static String title;
 	
-	private long window;
-	private int width, height;
+	private static long window;
+	private static int width, height;
 	
-	private double dt, now, then;
+	private static double dt, now, then;
 
-	public Window(String title, int width, int height) {
-		this.title = title;
-		this.width = width;
-		this.height = height;
+	public static void makeWindow(String title, int width, int height) {
+		Window.title = title;
+		Window.width = width;
+		Window.height = height;
 		
 		if (!init()) {
 			glfwTerminate();
 		}
 	}
 	
-	private boolean init() {
+	private static boolean init() {
 		
 		if (!glfwInit()) {
 			System.out.println("GLFW failed to initialize");
@@ -50,12 +50,15 @@ public class Window {
 		setCallbacks();
 		glfwMakeContextCurrent(window);
 		GL.createCapabilities();
-		then = glfwGetTime();
 		
+		Cursor.setVisibility(false);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		
+		then = glfwGetTime();
 		return true;
 	}
 	
-	public void update() {
+	public static void update() {
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 		glfwSwapInterval(0);
@@ -65,15 +68,15 @@ public class Window {
 		then = now;	
 	}
 	
-	public void clear() {
+	public static void clear() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 	
-	public boolean shouldClose() {
+	public static boolean shouldClose() {
 		return glfwWindowShouldClose(window);
 	}
 	
-	private void setCallbacks() {
+	private static void setCallbacks() {
 		GLFWWindowSizeCallback resizeCallback = new GLFWWindowSizeCallback() {
 			public void invoke(long window, int argWidth, int argHeight) {
 				width = argWidth;
@@ -88,16 +91,20 @@ public class Window {
 		glfwSetMouseButtonCallback(window, new Mouse());
 	}
 	
-	public double getDT() {
-		return this.dt;
+	public static long getID() {
+		return window;
 	}
 	
-	public int getWidth() {
-		return this.width;
+	public static double getDT() {
+		return Window.dt;
 	}
 	
-	public int getHeight() {
-		return this.height;
+	public static int getWidth() {
+		return Window.width;
+	}
+	
+	public static int getHeight() {
+		return Window.height;
 	}
 	
 }
