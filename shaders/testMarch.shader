@@ -39,7 +39,7 @@ void main()
 
 	uv.x *= iResolution.x / iResolution.y;
 	
-	vec3 ray = normalize(vec3(uv, 1.0));
+	vec3 ray = normalize(vec3(uv, 1.0));	
 	
 	ray.yz = rot2D(ray.yz, -iMouse.y);
 	ray.xz = rot2D(ray.xz, iMouse.x);

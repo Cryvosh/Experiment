@@ -120,5 +120,6 @@
 	<classpathentry kind="lib" path="lib/lwjgl-xxhash-sources.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl-xxhash.jar"/>
 	<classpathentry kind="lib" path="lib/lwjgl.jar"/>
+	<classpathentry kind="lib" path="lib/joml-1.9.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
