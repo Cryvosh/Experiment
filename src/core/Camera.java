@@ -47,10 +47,12 @@ public class Camera {
 		}
 		
 		if (Keyboard.isKeyPressed(GLFW_KEY_W)) {
-			pos.add(front.mul(currSpeed));
+			frontClone = new Vector3f(front);
+			pos.add(frontClone.mul(currSpeed));
 		}
 		if (Keyboard.isKeyPressed(GLFW_KEY_S)) {
-			pos.sub(front.mul(currSpeed));
+			frontClone = new Vector3f(front);
+			pos.sub(frontClone.mul(currSpeed));
 		}
 		if (Keyboard.isKeyPressed(GLFW_KEY_A)) {
 			frontClone = new Vector3f(front);
