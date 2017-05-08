@@ -2,11 +2,10 @@
 
 layout(location = 0) out vec4 color;
 
-uniform vec3 iPosition;
+uniform mat4 test;
 uniform vec2 iResolution;
 uniform float iGlobalTime;
 uniform vec2 iMouse;
-uniform vec3 iFront;
 
 float map(vec3 point) {
 	vec3 q = fract(point) * 2.0 - 1.0;
@@ -41,10 +40,13 @@ void main()
 	
 	vec3 ray = normalize(vec3(uv, 1.0));	
 	
-	ray.yz = rot2D(ray.yz, -iMouse.y);
-	ray.xz = rot2D(ray.xz, iMouse.x);
+	float x = -iMouse.x*0.01;
+	float y = iMouse.y*0.01;
+	
+	ray.xz *= mat2(cos(x), -sin(x), sin(x), cos(x));
+	ray.yz *= mat2(cos(y), -sin(y), sin(y), cos(y));
 
-	vec3 origin = iPosition;
+	vec3 origin = vec3(0, 0, iGlobalTime);
 
 	float t = trace(origin, ray);
 	float fog = 1.0 / (1.0 + t * t * 0.1);

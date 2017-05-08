@@ -6,6 +6,7 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import java.nio.*;
+import org.joml.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class Shader {
 		int location = glGetUniformLocation(programID, name);
 		
 		if (location == -1) {
-			System.out.println("Invalid uniform " + name);
+			//System.out.println("Invalid uniform " + name);
 		} else {
 			locationCache.put(name, location);
 		}
@@ -60,6 +61,11 @@ public class Shader {
 	
 	public void setUniform3f(String name, float x, float y, float z) {
 		glUniform3f(getUniform(name), x, y, z);
+	}
+	
+	public void setUniformMatrix4f(String name, Matrix4f matrix) {
+		FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
+		glUniformMatrix4fv(getUniform(name), true, matrix.get(buffer));
 	}
 	
 	private int load(String vertPath, String fragPath) {		

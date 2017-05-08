@@ -17,65 +17,54 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Cursor implements GLFWCursorPosCallbackI {
 	
-	private static double posX, posY;
-	private static double deltaX, deltaY;
+	private static double x, y;
+	private static double dx, dy;
+	private static double lastX = 400, lastY = 300;
+	
+	private static double sens = 0.3;
+	
+	private static boolean moved = false;
 	private static boolean visible;
-	
-	public static Vector3f front = new Vector3f(0, 0, 0);
-	
-	private boolean firstInput = true;
-	
-	public static float pitch, yaw;
-	
-	double lastX = Window.getWidth();
-	double lastY = 300;
-	
-	float sens = 0.5f;
-	
+		
 	@Override
 	public void invoke(long window, double x, double y) {
 		
-	    if(firstInput)
-	    {
-	        lastX = x;
-	        lastY = y;
-	        firstInput = false;
-	    }
-	    
-	    posX = x;
-	    posY = y;
+		if(!moved) {
+			lastX = x;
+			lastY = y;
+			moved = true;
+		}
 		
-		deltaX = x - lastX;
-		deltaY = lastY - y;
+		Cursor.x = x;
+		Cursor.y = y;
+		
+		dx = x - lastX;
+		dy = lastY - y;
 		
 		lastX = x;
 		lastY = y;
 		
-		deltaX *= sens;
-		deltaY *= sens;
+		dx *= sens;
+		dy *= sens;
 		
-		yaw += deltaX;
-		pitch += deltaY;
-		
-		if (pitch > 89.0f) {
-			pitch = 89.0f;
-		}
-			
-		if (pitch < -89.0f) {
-			pitch = -89.0f;
-		}
-		
-		front.x = (float) (Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)));
-		front.y = (float) (Math.sin(Math.toRadians(pitch)));
-		front.z = (float) (Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)));		
+		Camera.addYaw(dx);
+		Camera.addPitch(dy);
 	}
 	
-	public static double getX() {
-		return Cursor.posX;
+	public static double x() {
+		return x;
 	}
 	
-	public static double getY() {
-		return Cursor.posY;
+	public static double y() {
+		return y;
+	}
+	
+	public static double dx() {
+		return dx;
+	}
+	
+	public static double dy() {
+		return dy;
 	}
 	
 	public static boolean getVisibility() {
