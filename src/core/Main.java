@@ -21,7 +21,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Main {
 	
-	public static Camera3D activeCamera;
+	public static Camera2D activeCamera;
 	public static Shader activeShader;
 	
 	private static List<GameObject> objects = new ArrayList<>();
@@ -29,11 +29,11 @@ public class Main {
 	public static void main(String[] args) {
 		Window.makeWindow("Experiment2", 800, 600);
         
-		activeShader = new Shader("shaders/vertex.shader", "shaders/testMarch3.shader");
+		activeShader = new Shader("shaders/vertex.shader", "shaders/verboseMandelbrot.shader");
 		activeShader.enable();
 		
 		objects.add(new Quad());
-		objects.add(activeCamera = new Camera3D());
+		objects.add(activeCamera = new Camera2D());
 		
 		while(!Window.shouldClose()) {
 			Window.clear();

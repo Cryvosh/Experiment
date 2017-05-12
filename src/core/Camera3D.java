@@ -20,7 +20,7 @@ public class Camera3D implements GameObject {
 	
 	private static float pitch, yaw;
 	
-	private Vector3f pos = new Vector3f(0.0f, 0.0f, 3.0f);
+	private Vector3f pos = new Vector3f(0.0f, 0.0f, 0.0f);
 	private Vector3f front = new Vector3f(0.0f, 0.0f, -1.0f);
 	private Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
 	private Vector3f frontClone, upClone;
