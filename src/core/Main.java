@@ -29,7 +29,7 @@ public class Main {
 	public static void main(String[] args) {
 		Window.makeWindow("Experiment2", 800, 600);
         
-		activeShader = new Shader("shaders/vertex.shader", "shaders/testMarch2.shader");
+		activeShader = new Shader("shaders/vertex.shader", "shaders/testMarch3.shader");
 		activeShader.enable();
 		
 		objects.add(new Quad());
@@ -49,6 +49,7 @@ public class Main {
 	}
 	
 	public static void setDynamicUniforms(Shader shader) {
+		//Could put these in callbacks, but doesn't seem to affect performance
 		shader.setUniform2f("iMouse", (float)Cursor.x(), (float)Cursor.y());
 		shader.setUniform1f("iGlobalTime", (float)glfwGetTime());
 		shader.setUniform2f("iResolution", Window.getWidth(), Window.getHeight());

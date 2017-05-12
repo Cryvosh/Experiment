@@ -19,7 +19,7 @@ public class Window {
 	
 	private static String title;
 	
-	private static long window;
+	private static long windowID;
 	private static int width, height;
 	
 	private static double dt, now, then;
@@ -29,27 +29,27 @@ public class Window {
 		Window.width = width;
 		Window.height = height;
 		
-		if (!init()) {
+		if (!setup()) {
 			glfwTerminate();
 		}
 	}
 	
-	private static boolean init() {
+	private static boolean setup() {
 		
 		if (!glfwInit()) {
 			System.out.println("GLFW failed to initialize");
 			return false;
 		}
 		
-		window = glfwCreateWindow(width, height, title, NULL, NULL);
+		windowID = glfwCreateWindow(width, height, title, NULL, NULL);
 		
-		if (window == NULL) {
+		if (windowID == NULL) {
 			System.out.println("Failed to create window");
 			return false;
 		}
 		
 		setCallbacks();
-		glfwMakeContextCurrent(window);
+		glfwMakeContextCurrent(windowID);
 		GL.createCapabilities();
 		
 		Cursor.setVisibility(false);
@@ -61,7 +61,7 @@ public class Window {
 	
 	public static void update() {
 		glfwPollEvents();
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(windowID);
 		glfwSwapInterval(0);
 		
 		now = glfwGetTime();
@@ -74,7 +74,7 @@ public class Window {
 	}
 	
 	public static boolean shouldClose() {
-		return glfwWindowShouldClose(window);
+		return glfwWindowShouldClose(windowID);
 	}
 	
 	private static void setCallbacks() {
@@ -85,15 +85,16 @@ public class Window {
 				glViewport(0, 0, argWidth, argHeight);
 			}
 		};
-		glfwSetWindowSizeCallback(window, resizeCallback);
+		glfwSetWindowSizeCallback(windowID, resizeCallback);
 		
-		glfwSetKeyCallback(window, new Keyboard());
-		glfwSetCursorPosCallback(window, new Cursor());
-		glfwSetMouseButtonCallback(window, new Mouse());
+		glfwSetScrollCallback(windowID, new Scroll());
+		glfwSetKeyCallback(windowID, new Keyboard());
+		glfwSetCursorPosCallback(windowID, new Cursor());
+		glfwSetMouseButtonCallback(windowID, new Mouse());
 	}
 	
 	public static long getID() {
-		return window;
+		return windowID;
 	}
 	
 	public static double getDT() {

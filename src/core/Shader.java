@@ -8,7 +8,9 @@ import org.lwjgl.system.*;
 import java.nio.*;
 import org.joml.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -22,6 +24,7 @@ public class Shader {
 	
 	private final int programID;
 	private Map<String, Integer> locationCache = new HashMap<>();
+	private Set<String> invalidUniforms = new HashSet<>();
 	
 	public Shader(String vertPath, String fragPath) {
 		programID = load(vertPath, fragPath);
@@ -35,15 +38,20 @@ public class Shader {
 		glUseProgram(0);
 	}
 	
-	public int getUniform(String name) {
+	private int getUniform(String name) {
 		if (locationCache.containsKey(name)) {
 			return locationCache.get(name);
+		}
+		
+		if (invalidUniforms.contains(name)) {
+			return -1;
 		}
 		
 		int location = glGetUniformLocation(programID, name);
 		
 		if (location == -1) {
-			//System.out.println("Invalid uniform " + name);
+			invalidUniforms.add(name);
+			System.out.println("Invalid/unused uniform: " + name);
 		} else {
 			locationCache.put(name, location);
 		}
