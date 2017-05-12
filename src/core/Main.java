@@ -6,6 +6,8 @@ import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import java.nio.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -19,31 +21,34 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Main {
 	
-	private static Quad quad;
-	public static Shader testShader;
+	public static Camera3D activeCamera;
+	public static Shader activeShader;
+	
+	private static List<GameObject> objects = new ArrayList<>();
 	
 	public static void main(String[] args) {
 		Window.makeWindow("Experiment2", 800, 600);
         
-		testShader = new Shader("shaders/vertex.shader", "shaders/testMarch2.shader");
-		testShader.enable();
+		activeShader = new Shader("shaders/vertex.shader", "shaders/testMarch2.shader");
+		activeShader.enable();
 		
-		quad = new Quad();
-		Camera.setupCam();
+		objects.add(new Quad());
+		objects.add(activeCamera = new Camera3D());
 		
 		while(!Window.shouldClose()) {
 			Window.clear();
 	        
-			quad.update();
+			for(GameObject obj : objects) {
+				obj.update();
+			}
 		    
-		    setUniforms(testShader);
+			setDynamicUniforms(activeShader);
 			
 			Window.update();
 		}
 	}
 	
-	public static void setUniforms(Shader shader) {
-		Camera.updateCam();
+	public static void setDynamicUniforms(Shader shader) {
 		shader.setUniform2f("iMouse", (float)Cursor.x(), (float)Cursor.y());
 		shader.setUniform1f("iGlobalTime", (float)glfwGetTime());
 		shader.setUniform2f("iResolution", Window.getWidth(), Window.getHeight());

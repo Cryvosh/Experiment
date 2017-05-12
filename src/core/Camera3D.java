@@ -16,26 +16,26 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public class Camera {
+public class Camera3D implements GameObject {
 	
 	private static float pitch, yaw;
 	
-	private static Vector3f pos = new Vector3f(0.0f, 0.0f, 3.0f);
-	private static Vector3f front = new Vector3f(0.0f, 0.0f, -1.0f);
-	private static Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
-	private static Vector3f frontClone, upClone;
+	private Vector3f pos = new Vector3f(0.0f, 0.0f, 3.0f);
+	private Vector3f front = new Vector3f(0.0f, 0.0f, -1.0f);
+	private Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
+	private Vector3f frontClone, upClone;
 	
-	private static float speed = 1.5f;
-	private static float shiftSpeed = 8.0f;
-	private static float currSpeed;
+	private float speed = 1.5f;
+	private float shiftSpeed = 8.0f;
+	private float currSpeed;
 	
-	private static float verticalFOV = 120.0f;
+	private float verticalFOV = 120.0f;
 	
-	public static void setupCam() {
-		Main.testShader.setUniform1f("iVerticalFOV", verticalFOV);
+	public Camera3D () {
+		Main.activeShader.setUniform1f("iVerticalFOV", verticalFOV);
 	}
 	
-	public static void updateCam () {
+	public void update () {
 		setFront();
 		
 		currSpeed = (float) (speed * Window.getDT());
@@ -67,12 +67,13 @@ public class Camera {
 		
 		Matrix4f view = new Matrix4f().lookAt(pos, front.add(pos), up);
 		
-		Main.testShader.setUniformMatrix4f("iViewMatrix", view);
-		Main.testShader.setUniform3f("iPosition", pos.x, pos.y, pos.z);
+		Main.activeShader.setUniformMatrix4f("iViewMatrix", view);
+		Main.activeShader.setUniform3f("iPosition", pos.x, pos.y, pos.z);
 	}
 	
-	public static void addPitch(double offset) {
-		pitch += offset;
+	public void rotate(double dPitch, double dYaw) {
+		pitch += dPitch;
+		yaw += dYaw;
 		
 		if (pitch > 89.0f) {
 	        pitch = 89.0f;
@@ -81,11 +82,7 @@ public class Camera {
 	    }
 	}
 	
-	public static void addYaw(double offset) {
-		yaw += offset;
-	}
-	
-	private static void setFront() {
+	private void setFront() {
 		front.x = (float) (Math.cos(Math.toRadians(pitch)) * Math.cos(Math.toRadians(yaw)));
 		front.y = (float) (Math.sin(Math.toRadians(pitch)));
 		front.z = (float) (Math.cos(Math.toRadians(pitch)) * Math.sin(Math.toRadians(yaw)));

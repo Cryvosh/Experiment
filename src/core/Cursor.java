@@ -47,8 +47,7 @@ public class Cursor implements GLFWCursorPosCallbackI {
 		dx *= sens;
 		dy *= sens;
 		
-		Camera.addYaw(dx);
-		Camera.addPitch(dy);
+		Main.activeCamera.rotate(dy, dx);		
 	}
 	
 	public static double x() {
