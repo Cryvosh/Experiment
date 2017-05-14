@@ -36,6 +36,10 @@ public class Keyboard implements GLFWKeyCallbackI{
 		if (isKeyDown(GLFW_KEY_ESCAPE)) {
 			Cursor.setVisibility(true);
 		}
+		
+		if (isKeyDown(GLFW_KEY_TAB)) {
+			Main.nextShader();
+		}
 	}
 	
 	public static boolean isKeyDown(int key) {

@@ -16,7 +16,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public class Camera3D implements GameObject {
+public class Camera3D implements Camera {
 	
 	private static float pitch, yaw;
 	
@@ -87,5 +87,9 @@ public class Camera3D implements GameObject {
 		front.y = (float) (Math.sin(Math.toRadians(pitch)));
 		front.z = (float) (Math.cos(Math.toRadians(pitch)) * Math.sin(Math.toRadians(yaw)));
 		front.normalize();
+	}
+
+	public void handleCursor(double dx, double dy) {
+		rotate(dx, dy);		
 	}
 }

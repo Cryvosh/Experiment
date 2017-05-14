@@ -22,12 +22,19 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Shader {
 	
+	private int targetDimension;
 	private final int programID;
 	private Map<String, Integer> locationCache = new HashMap<>();
 	private Set<String> invalidUniforms = new HashSet<>();
 	
 	public Shader(String vertPath, String fragPath) {
 		programID = load(vertPath, fragPath);
+		
+		if(fragPath.matches(".*2[d|D].*")) {
+			targetDimension = 2;
+		} else if (fragPath.matches(".*3[d|D].*")){
+			targetDimension = 3;
+		}
 	}
 	
 	public void enable() {
@@ -36,6 +43,10 @@ public class Shader {
 	
 	public void disable() {
 		glUseProgram(0);
+	}
+	
+	public int targetDimension() {
+		return targetDimension;
 	}
 	
 	private int getUniform(String name) {
@@ -51,7 +62,7 @@ public class Shader {
 		
 		if (location == -1) {
 			invalidUniforms.add(name);
-			System.out.println("Invalid/unused uniform: " + name);
+			//System.out.println("Invalid/unused uniform: " + name);
 		} else {
 			locationCache.put(name, location);
 		}
@@ -91,13 +102,13 @@ public class Shader {
 		glCompileShader(fragShader);
 		
 		if (glGetShaderi(vertShader, GL_COMPILE_STATUS) == GL_FALSE) {
-			System.out.println("Failed to compile vertex shader");
+			System.out.println("Failed to compile vertex shader " + vertPath);
 			System.out.println(glGetShaderInfoLog(vertShader));
 			return -1;
 		}
 		
 		if (glGetShaderi(fragShader, GL_COMPILE_STATUS) == GL_FALSE) {
-			System.out.println("Failed to compile fragment shader");
+			System.out.println("Failed to compile fragment shader " + fragPath);
 			System.out.println(glGetShaderInfoLog(fragShader));
 			return -1;
 		}

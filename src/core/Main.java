@@ -5,6 +5,7 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
+import java.io.File;
 import java.nio.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,19 +22,23 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Main {
 	
-	public static Camera2D activeCamera;
+	public static Camera activeCamera;
 	public static Shader activeShader;
+	
+	private static int index = 0;
+	private static String[] shaders;
+	private static String shaderDirectory = "shaders/frag";
 	
 	private static List<GameObject> objects = new ArrayList<>();
 	
 	public static void main(String[] args) {
-		Window.makeWindow("Experiment2", 800, 600);
-        
-		activeShader = new Shader("shaders/vertex.shader", "shaders/verboseMandelbrot.shader");
-		activeShader.enable();
+		Window.makeWindow("Experiment", 800, 600);
 		
 		objects.add(new Quad());
-		objects.add(activeCamera = new Camera2D());
+		
+		File directory = new File(shaderDirectory);
+		shaders = directory.list();
+		nextShader();
 		
 		while(!Window.shouldClose()) {
 			Window.clear();
@@ -45,6 +50,26 @@ public class Main {
 			setDynamicUniforms(activeShader);
 			
 			Window.update();
+		}
+	}
+	
+	public static void nextShader() {
+		System.out.println(shaders[index]);
+		objects.remove(activeCamera);
+		
+		activeShader = new Shader("shaders/vert/vertex.vert", shaderDirectory + "/" + shaders[index]);
+		activeShader.enable();
+		
+		if (activeShader.targetDimension() == 2) {
+			objects.add(activeCamera = new Camera2D());
+		} else {
+			objects.add(activeCamera = new Camera3D());
+		}
+		
+		if (index == shaders.length - 1) {
+			index = 0;
+		} else {
+			index += 1;
 		}
 	}
 	
