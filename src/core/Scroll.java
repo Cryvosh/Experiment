@@ -17,11 +17,17 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class Scroll implements GLFWScrollCallbackI {
 	
 	private static double x, y;
-
+	private static double dx, dy;
+	
 	@Override
 	public void invoke(long window, double dx, double dy) {
+		Scroll.dx = dx;
+		Scroll.dy = dy;
+		
 		x += dx;
 		y += dy;
+		
+		Main.activeCamera.handleScroll(dy);
 	}
 	
 	public static double x() {
@@ -30,5 +36,13 @@ public class Scroll implements GLFWScrollCallbackI {
 	
 	public static double y() {
 		return Scroll.y;
+	}
+	
+	public static double dx() {
+		return Scroll.dx;
+	}
+	
+	public static double dy() {
+		return Scroll.dy;
 	}
 }

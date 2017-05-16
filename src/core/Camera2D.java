@@ -66,4 +66,8 @@ public class Camera2D implements Camera {
 	public void handleCursor(double dx, double dy) {
 		
 	}
+	
+	public void handleScroll(double dy) {
+		
+	}
 }

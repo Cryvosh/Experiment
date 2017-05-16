@@ -3,7 +3,7 @@
 uniform vec2 iResolution;
 uniform float iGlobalTime;
 uniform vec2 iPosition;
-uniform float iZoomScale;
+uniform float iZoom;
 
 layout(location = 0) out vec4 color;
 
@@ -29,7 +29,7 @@ void main() {
 	uv = uv * 2.0 - 1.0;
 	uv.x *= iResolution.x / iResolution.y;
 	
-	vec2 c = iPosition + (uv) / iZoomScale;
+	vec2 c = iPosition + uv * iZoom;
 	
 	int i;
 	vec2 z = c;
@@ -37,7 +37,7 @@ void main() {
 	for (i = 0; i<1000; i++) {
 		z = iterate(z) + c;
 		if(!inSet(z)) {
-			color = vec4(vec3(i/100.0), 1.0);
+			color = vec4(vec3(sin(i)+1.8), 1.0);
 			return;
 		}
 	}

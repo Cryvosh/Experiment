@@ -7,7 +7,7 @@ import org.lwjgl.system.*;
 
 import java.nio.*;
 import org.joml.*;
-import org.joml.Math;
+import java.lang.Math;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -20,13 +20,14 @@ public class Camera3D implements Camera {
 	
 	private static float pitch, yaw;
 	
-	private Vector3f pos = new Vector3f(0.0f, 0.0f, 0.0f);
+	private Vector3f pos = new Vector3f(30.0f, 10.0f, 15.0f);
 	private Vector3f front = new Vector3f(0.0f, 0.0f, -1.0f);
 	private Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
 	private Vector3f frontClone, upClone;
 	
 	private float speed = 1.5f;
-	private float shiftSpeed = 8.0f;
+	private float ctrlMultiplier = 0.1f;
+	private float shiftMultiplier = 20.0f;
 	private float currSpeed;
 	
 	private float verticalFOV = 120.0f;
@@ -41,7 +42,9 @@ public class Camera3D implements Camera {
 		currSpeed = (float) (speed * Window.getDT());
 		
 		if (Keyboard.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
-			currSpeed = (float) (shiftSpeed * Window.getDT());
+			currSpeed = (float) (speed * shiftMultiplier * Window.getDT());
+		} else if (Keyboard.isKeyPressed(GLFW_KEY_LEFT_CONTROL)) {
+			currSpeed = (float) (speed * ctrlMultiplier * Window.getDT());
 		} else {
 			currSpeed = (float) (speed * Window.getDT());
 		}
@@ -90,6 +93,14 @@ public class Camera3D implements Camera {
 	}
 
 	public void handleCursor(double dx, double dy) {
-		rotate(dx, dy);		
+		rotate(dx, dy);
+	}
+	
+	public void handleScroll(double dy) {
+		if(dy > 0) {
+			this.speed *= 1.2;
+		} else {
+			this.speed *= 0.8;
+		}
 	}
 }

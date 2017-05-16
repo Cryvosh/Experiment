@@ -27,7 +27,7 @@ public class Main {
 	
 	private static int index = 0;
 	private static String[] shaders;
-	private static String shaderDirectory = "shaders/frag";
+	private static String shaderDirectory = "shaders/frag/active";
 	
 	private static List<GameObject> objects = new ArrayList<>();
 	
