@@ -18,6 +18,7 @@ public class Scroll implements GLFWScrollCallbackI {
 	
 	private static double x, y;
 	private static double dx, dy;
+	private static double tempDelta;
 	
 	@Override
 	public void invoke(long window, double dx, double dy) {
@@ -26,23 +27,25 @@ public class Scroll implements GLFWScrollCallbackI {
 		
 		x += dx;
 		y += dy;
-		
-		Main.activeCamera.handleScroll(dy);
 	}
 	
 	public static double x() {
-		return Scroll.x;
+		return x;
 	}
 	
 	public static double y() {
-		return Scroll.y;
+		return y;
 	}
 	
 	public static double dx() {
-		return Scroll.dx;
+		tempDelta = dx;
+		dx = 0;
+		return tempDelta;
 	}
 	
 	public static double dy() {
-		return Scroll.dy;
+		tempDelta = dy;
+		dy = 0;
+		return tempDelta;
 	}
 }

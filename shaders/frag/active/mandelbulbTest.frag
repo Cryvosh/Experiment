@@ -10,31 +10,38 @@ uniform float iNearClip;
 uniform vec2 iMouse;
 uniform float iVerticalFOV;
 
-const float EPSILON = 0.0001;
-
 const int ITERATIONS = 128;
+const float power = 8.0;
 
-vec3 CSize;
-
-float DE( vec3 p )
+float DE(vec3 pos)
 {
-	CSize = vec3(1., 1., 1.3);
-	p = p.xzy;
-	float scale = 1.;
-	for( int i=0; i < 20;i++ )
-	{
-		p = 2.0*clamp(p, -CSize, CSize) - p;
-		//float r2 = dot(p,p);
-        float r2 = dot(p,p+sin(p.z*.3));
-		float k = max((2.)/(r2), .027);
-		p     *= k;
-		scale *= k;
+    const int iterations = 20;
+    
+    vec3 z = pos;
+	float dr = 1.0;
+	float r = 0.0;
+	for (int i = 0; i < iterations ; i++) {
+		r = length(z);
+        
+		if (r > 2.0) {
+            break;
+        }
+		
+		// convert to polar coordinates
+		float theta = acos(z.z/r);
+		float phi = atan(z.y, z.x);
+		dr =  pow(r, power-1.0) * power * dr + 1.0;
+		
+		// scale and rotate the point
+		float zr = pow(r, power);
+		theta *= power;
+		phi *= power;
+        
+		// convert back to cartesian coordinates
+		z = zr*vec3(sin(theta)*cos(phi), sin(phi)*sin(theta), cos(theta));
+		z += pos;
 	}
-	float l = length(p.xy);
-	float rxy = l - 4.0;
-	float n = l * p.z;
-	rxy = max(rxy, -(n) / 4.);
-	return (rxy) / abs(scale);
+	return 0.5*log(r)*r/dr;
 }
 
 float march(vec3 origin, vec3 direction, float nearClipDist) {
@@ -42,8 +49,9 @@ float march(vec3 origin, vec3 direction, float nearClipDist) {
 	int steps;
 	for (steps = 0; steps < ITERATIONS; steps++) {
 		float dist = DE(origin + depth * direction);	
+		float epsilon = depth * 0.001;
 		
-		if(dist < EPSILON) {
+		if(dist < epsilon) {
 			break;
 		}
 			

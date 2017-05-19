@@ -61,13 +61,6 @@ public class Camera2D implements Camera {
 		zoom = 1/(float)Math.pow(2.0, zoomExponent);
 		Main.activeShader.setUniform1f("iZoom", zoom);
 		Main.activeShader.setUniform2f("iPosition", pos.x, pos.y);
-	}
-
-	public void handleCursor(double dx, double dy) {
-		
-	}
-	
-	public void handleScroll(double dy) {
-		
+		System.out.println(pos);
 	}
 }

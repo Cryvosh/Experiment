@@ -19,12 +19,14 @@ public class Cursor implements GLFWCursorPosCallbackI {
 	
 	private static double x, y;
 	private static double dx, dy;
+	private static double tempDelta;
 	private static double lastX = 400, lastY = 300;
 	
 	private static double sens = 0.3;
 	
 	private static boolean moved = false;
 	private static boolean visible;
+	
 		
 	@Override
 	public void invoke(long window, double x, double y) {
@@ -46,8 +48,6 @@ public class Cursor implements GLFWCursorPosCallbackI {
 		
 		dx *= sens;
 		dy *= sens;
-		
-		Main.activeCamera.handleCursor(dy, dx);
 	}
 	
 	public static double x() {
@@ -59,11 +59,15 @@ public class Cursor implements GLFWCursorPosCallbackI {
 	}
 	
 	public static double dx() {
-		return dx;
+		tempDelta = dx;
+		dx = 0;
+		return tempDelta;
 	}
 	
 	public static double dy() {
-		return dy;
+		tempDelta = dy;
+		dy = 0;
+		return tempDelta;
 	}
 	
 	public static boolean getVisibility() {

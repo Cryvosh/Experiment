@@ -20,7 +20,7 @@ public class Camera3D implements Camera {
 	
 	private static float pitch, yaw;
 	
-	private Vector3f pos = new Vector3f(30.0f, 10.0f, 15.0f);
+	private Vector3f pos = new Vector3f(-2.0f, -0.3f, 0.5f);
 	private Vector3f front = new Vector3f(0.0f, 0.0f, -1.0f);
 	private Vector3f up = new Vector3f(0.0f, 1.0f, 0.0f);
 	private Vector3f frontClone, upClone;
@@ -37,6 +37,8 @@ public class Camera3D implements Camera {
 	}
 	
 	public void update () {
+		rotate(Cursor.dy(), Cursor.dx());
+		modifySpeed(Scroll.dy());
 		setFront();
 		
 		currSpeed = (float) (speed * Window.getDT());
@@ -91,15 +93,11 @@ public class Camera3D implements Camera {
 		front.z = (float) (Math.cos(Math.toRadians(pitch)) * Math.sin(Math.toRadians(yaw)));
 		front.normalize();
 	}
-
-	public void handleCursor(double dx, double dy) {
-		rotate(dx, dy);
-	}
 	
-	public void handleScroll(double dy) {
+	public void modifySpeed(double dy) {
 		if(dy > 0) {
 			this.speed *= 1.2;
-		} else {
+		} else if (dy < 0) {
 			this.speed *= 0.8;
 		}
 	}
