@@ -32,21 +32,26 @@ public class Keyboard implements GLFWKeyCallbackI{
 		}
 		
 		keys[key] = (action != GLFW_RELEASE);
+		
+		if (Keyboard.keyPressed(GLFW_KEY_GRAVE_ACCENT)) {
+			glfwTerminate();
+			Main.runNextApp();
+		}
 	}
 	
-	public static boolean isKeyDown(int key) {
+	public static boolean keyPressed(int key) {
 		boolean temp = keysDown[key];
 		keysDown[key] = false;
 		return temp;
 	}
 	
-	public static boolean isKeyUp(int key) {
+	public static boolean keyReleased(int key) {
 		boolean temp = keysUp[key];
 		keysUp[key] = false;
 		return temp;
 	}
 	
-	public static boolean isKeyPressed(int key) {
+	public static boolean keyHeldDown(int key) {
 		return keys[key];
 	}
 }

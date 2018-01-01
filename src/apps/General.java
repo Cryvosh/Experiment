@@ -22,78 +22,79 @@ import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public class General {
+public class General implements App {
 	
-	public Camera activeCamera;
-	public Shader activeShader;
+	private Camera activeCamera;
+	private Quad activeQuad;
 	
 	private int index = 0;
 	private String[] shaders;
 	private String shaderDirectory = "shaders/frag/general";
 	
-	private List<Entity> objects = new ArrayList<>();
+	private List<Entity> entites = new ArrayList<>();
 	
 	public void run() {
-		Window.makeWindow("Experiment", 800, 600);
+		Window.makeWindow("General Experiment", 800, 600);
 		
-		objects.add(new Quad());
-		setup();
+		File directory = new File(shaderDirectory);
+		shaders = directory.list();
+		nextShader();
 		
 		while(!Window.shouldClose()) {
 			update();
 		}
 	}
 	
-	private void setup() {
-		File directory = new File(shaderDirectory);
-		shaders = directory.list();
-		nextShader();
-	}
-	
 	private void update() {
 		Window.clear();
-        
-		for(Entity obj : objects) {
-			obj.update();
+
+		for(Entity ent : entites) {
+			ent.update();
 		}
-	    
-		setDynamicUniforms(activeShader);
+		
+		activeQuad.render();
+		setDynamicUniforms(activeQuad.getShader());
+		
 		checkKeys();
 		
 		Window.update();
 	}
 	
-	public void nextShader() {		
-		index = (index + 1) % shaders.length;		
+	private void nextShader() {		
+		index = (index + 1) % shaders.length;
 		resetShader();
 	}
 	
-	public void resetShader() {
+	private void resetShader() {
 		System.out.println(shaders[index]);
-		objects.remove(activeCamera);
+		entites.remove(activeCamera);
 		
-		activeShader = new Shader("shaders/vert/vertex.vert", shaderDirectory + "/" + shaders[index]);
-		activeShader.enable();
+		glfwSetTime(0);
+		Shader shader = new Shader("shaders/vert/vertex.vert", shaderDirectory + "/" + shaders[index]);
 		
-		if (activeShader.targetDimension() == 2) {
-			objects.add(activeCamera = new Camera2D(activeShader));
+		if (shader.targetDimension() == 2) {
+			activeQuad = new Quad(1.0f, 0, shader);
+			entites.add(activeCamera = new Camera2D(activeQuad));
 		} else {
-			objects.add(activeCamera = new Camera3D(activeShader, 120f));
+			activeQuad = new Quad(1.0f, 0, shader);
+			entites.add(activeCamera = new Camera3D(activeQuad, 120f));
 		}
 	}
 	
 	private void checkKeys() {
-		if (Keyboard.isKeyDown(GLFW_KEY_TAB)) {
+		if (Keyboard.keyPressed(GLFW_KEY_TAB)) {
 			nextShader();
 		}
-		if (Keyboard.isKeyDown(GLFW_KEY_R)) {
+		if (Keyboard.keyPressed(GLFW_KEY_R)) {
 			resetShader();
 		}
 	}
 	
-	public void setDynamicUniforms(Shader shader) {
+	private void setDynamicUniforms(Shader shader) {
+		shader.enable();
 		shader.setUniform2f("iMouse", (float)Cursor.x(), (float)Cursor.y());
 		shader.setUniform1f("iGlobalTime", (float)glfwGetTime());
 		shader.setUniform2f("iResolution", Window.getWidth(), Window.getHeight());
+		shader.disable();
 	}
 }

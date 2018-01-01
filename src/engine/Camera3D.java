@@ -8,6 +8,8 @@ import org.lwjgl.system.*;
 import java.nio.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.nio.file.*;
 
 import org.joml.*;
@@ -41,12 +43,28 @@ public class Camera3D implements Camera {
 	private float shiftMultiplier = 20.0f;
 	private float currSpeed;
 	
-	private Shader activeShader;
+	private List<Shader> shaders = new ArrayList<>();
 	
-	public Camera3D (Shader shader, float fov) {
+	public Camera3D (List<Quad> quad, float fov) {		
+		for(Quad q : quad) {
+			shaders.add(q.getShader());
+		}
 		
-		activeShader = shader;
-		activeShader.setUniform1f("iVerticalFOV", fov);
+		for(Shader shader: shaders) {
+			shader.enable();
+			shader.setUniform1f("iVerticalFOV", fov);
+			shader.disable();
+		}
+	}
+	
+	public Camera3D (Quad quad, float fov) {		
+		shaders.add(quad.getShader());
+		
+		for(Shader shader: shaders) {
+			shader.enable();
+			shader.setUniform1f("iVerticalFOV", fov);
+			shader.disable();
+		}
 	}
 	
 	public void update () {
@@ -59,58 +77,63 @@ public class Camera3D implements Camera {
 		currSpeed *= multiplySpeed(ctrlMultiplier, shiftMultiplier);
 		
 		// Local space movement
-		if (Keyboard.isKeyPressed(GLFW_KEY_W)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_W)) {
 			Vector3f frontClone = new Vector3f(front);
 			pos.add(frontClone.mul(currSpeed));
 		}
-		if (Keyboard.isKeyPressed(GLFW_KEY_S)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_S)) {
 			Vector3f frontClone = new Vector3f(front);
 			pos.sub(frontClone.mul(currSpeed));
 		}
-		if (Keyboard.isKeyPressed(GLFW_KEY_A)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_A)) {
 			Vector3f frontClone = new Vector3f(front);
 			Vector3f global_y = new Vector3f(y);
 			pos.sub(((frontClone.cross(global_y)).normalize()).mul(currSpeed));
 		}
-		if (Keyboard.isKeyPressed(GLFW_KEY_D)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_D)) {
 			Vector3f frontClone = new Vector3f(front);
 			Vector3f global_y = new Vector3f(y);
 			pos.add(((frontClone.cross(global_y)).normalize()).mul(currSpeed));
 		}
 		
 		// Global space movement
-		if (Keyboard.isKeyPressed(GLFW_KEY_H)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_H)) {
 			Vector3f global_x = new Vector3f(x);
 			pos.add(global_x.mul(currSpeed));
 		}
-		if (Keyboard.isKeyPressed(GLFW_KEY_K)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_K)) {
 			Vector3f global_x = new Vector3f(x);
 			pos.sub(global_x.mul(currSpeed));
 		}
-		if (Keyboard.isKeyPressed(GLFW_KEY_Y)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_Y)) {
 			Vector3f global_y = new Vector3f(y);
 			pos.add(global_y.mul(currSpeed));
 		}
-		if (Keyboard.isKeyPressed(GLFW_KEY_I)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_I)) {
 			Vector3f global_y = new Vector3f(y);
 			pos.sub(global_y.mul(currSpeed));
 		}
-		if (Keyboard.isKeyPressed(GLFW_KEY_U)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_U)) {
 			Vector3f global_z = new Vector3f(z);
 			pos.add(global_z.mul(currSpeed));
 		}
-		if (Keyboard.isKeyPressed(GLFW_KEY_J)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_J)) {
 			Vector3f gloabl_z = new Vector3f(z);
 			pos.sub(gloabl_z.mul(currSpeed));
 		}
 		
-		if (Keyboard.isKeyPressed(GLFW_KEY_LEFT_ALT)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_LEFT_ALT)) {
 			System.out.println("POS: " + (int)pos.x + " " + (int)pos.y + " " + (int)pos.z);
 		}
 		
 		Matrix4f view = new Matrix4f().lookAt(pos, front.add(pos), y);
-		activeShader.setUniformMatrix4f("iViewMatrix", view);
-		activeShader.setUniform3f("iPosition", pos.x, pos.y, pos.z);
+		
+		for(Shader shader: shaders) {
+			shader.enable();
+			shader.setUniformMatrix4f("iViewMatrix", view);
+			shader.setUniform3f("iPosition", pos.x, pos.y, pos.z);
+			shader.disable();
+		}
 	}
 	
 	private void rotate(double dPitch, double dYaw) {
@@ -136,12 +159,13 @@ public class Camera3D implements Camera {
 	}
 	
 	private void modifyNearClip() {
-		if (Keyboard.isKeyPressed(GLFW_KEY_RIGHT_BRACKET)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_RIGHT_BRACKET)) {
 			nearClip += 10 * Window.getDT();
-			activeShader.setUniform1f("iNearClip", nearClip);
-		} else if (Keyboard.isKeyPressed(GLFW_KEY_LEFT_BRACKET)) {
+		} else if (Keyboard.keyHeldDown(GLFW_KEY_LEFT_BRACKET)) {
 			nearClip = Math.max(0, nearClip - 10 * (float)Window.getDT());
-			activeShader.setUniform1f("iNearClip", nearClip);
+		}
+		for(Shader shader: shaders) {
+			shader.setUniform1f("iNearClip", nearClip);
 		}
 	}
 }

@@ -1,6 +1,6 @@
 # Experiment
 
-**General 3D Controls**
+**3D Camera Controls**
 
 * Move mouse to look around
 * W/A/S/D to move forward/left/back/right (local space)
@@ -9,36 +9,35 @@
 * Hold SHIFT/LEFT_CTRL to temporarily speed up/slow down
 * Hold [/] to move the near clip plane closer/further
 
-**General 2D Controls**
+**2D Camera Controls**
 
 * W/A/S/D to move up/left/down/right
 * Up/down arrows to zoom in/out
 
-**Tup3D Controls**
+**apps/Tup3D Controls**
+
 * Press 8/9 to decrement/increment n by 1
 * Hold 7/0 to decrement/increment n repeatedly
+* Set n via console using commands "/nFromFile" or "/nFromObj"
+
+**apps/General Controls**
+* Press TAB to cycle through shaders in shaders/frag/general
 
 **Misc Controls**
 
 * Press ESC to free mouse
-* Press TAB to cycle through shaders
-* Press R to reset/reload current shader
-* Hold SPACE to show FPS
-* Hold T to see shader time
+* Press `/~/tilde to cycle through apps
 * Hold LEFT_ALT to see integer camera coordinates
+* Press R to reset/reload current shader
+* Hold T to see shader time
+* Hold SPACE to show FPS
 
 **Misc notes**
 
-* All shader filenames should include one of '2d'/'2D'/'3d'/'3D' to denote 
-which camera type/control scheme is required for that shader.
+* Tup3D.n can be set via commandline using commands `/nFromFile <path>` or `/nFromObj <path>` where `<path>` is optional, eg., `/nFromObj appData/Tup3D/n.obj`.
+
+* All filenames in shaders/frag/general should include one of '2d'/'2D'/'3d'/'3D' to denote which camera type/control scheme is required for that shader.
 
 * Shaders can be modified during runtime by simply pressing R to reset/reload the current shader.
-
-* General-purpose/Tup3D rendering can be toggled in Main.
-
-* Only shaders in shaders/frag/general will be loaded by General.java.
-
-* Tup3D.n can be set in code or read from binary file n_val/n.val, which can be modified using a 
-hex editor.
 
 * Y-axis is up (global space) by convention.

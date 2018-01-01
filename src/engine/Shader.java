@@ -104,8 +104,8 @@ public class Shader {
 		int vertShader = glCreateShader(GL_VERTEX_SHADER);
 		int fragShader = glCreateShader(GL_FRAGMENT_SHADER);
 		
-		String vertSource = FileIO.readFile(vertPath);
-		String fragSource = FileIO.readFile(fragPath);
+		String vertSource = FileIO.shaderToString(vertPath);
+		String fragSource = FileIO.shaderToString(fragPath);
 		
 		glShaderSource(vertShader, vertSource);
 		glShaderSource(fragShader, fragSource);

@@ -18,18 +18,21 @@ import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 //Generalize to/inherit from Mesh later
-public class Quad implements Entity {
+public class Quad {
 	
 	private int vaoID;
+	private Shader shader;
 	
-	public Quad() {
-		float vertices[] = {
-				 -1.0f, -1.0f, 0.0f,
-				 -1.0f,  1.0f, 0.0f,
-				  1.0f,  1.0f, 0.0f,
-				  1.0f,  1.0f, 0.0f,
-				  1.0f, -1.0f, 0.0f,
-				 -1.0f, -1.0f, 0.0f,
+	public Quad(float x, float depth, Shader shader) {
+		this.shader = shader;
+		
+		float vertices[] = {				
+				 -x, -x, depth,
+				 -x,  x, depth,
+				  x,  x, depth,
+				  x,  x, depth,
+				  x, -x, depth,
+				 -x, -x, depth,
 		};
 		
 		vaoID = glGenVertexArrays();
@@ -43,12 +46,25 @@ public class Quad implements Entity {
 		glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
 		
 		glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);		
 	}
 	
-	public void update() {
+	public int getVAO() {
+		return this.vaoID;
+	}
+	
+	public Shader getShader() {
+		return this.shader;
+	}
+	
+	public void render() {
+		shader.enable();
 		glBindVertexArray(vaoID);
 	    glEnableVertexAttribArray(0);
 	    glDrawArrays(GL_TRIANGLES, 0, 6);
+	    glDisableVertexAttribArray(0);
+	    glBindVertexArray(0);
+	    shader.disable();
 	}
 }

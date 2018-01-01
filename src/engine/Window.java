@@ -1,25 +1,45 @@
 package engine;
 
-import org.lwjgl.*;
-import org.lwjgl.glfw.*;
-import org.lwjgl.opengl.*;
-import org.lwjgl.system.*;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_T;
+import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
+import static org.lwjgl.glfw.GLFW.glfwGetTime;
+import static org.lwjgl.glfw.GLFW.glfwInit;
+import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
+import static org.lwjgl.glfw.GLFW.glfwPollEvents;
+import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowSizeCallback;
+import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
+import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
+import static org.lwjgl.glfw.GLFW.glfwTerminate;
+import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.system.MemoryUtil.NULL;
 
-import java.nio.*;
-import org.joml.*;
-
-import static org.lwjgl.glfw.Callbacks.*;
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
-
-import static org.lwjgl.system.MemoryStack.*;
-import static org.lwjgl.system.MemoryUtil.*;
+import org.lwjgl.glfw.GLFWWindowSizeCallback;
+import org.lwjgl.opengl.GL;
 
 public class Window {
 	
 	private static String title;
 	
-	private static long windowID;
+	private static long windowID = -1;
 	private static int width, height;
 	
 	private static double dt, now, then;
@@ -35,7 +55,6 @@ public class Window {
 	}
 	
 	private static boolean setup() {
-		
 		if (!glfwInit()) {
 			System.out.println("GLFW failed to initialize");
 			return false;
@@ -51,9 +70,12 @@ public class Window {
 		setCallbacks();
 		glfwMakeContextCurrent(windowID);
 		GL.createCapabilities();
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
 		Cursor.setVisibility(false);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		
 		then = glfwGetTime();
 		return true;
@@ -68,21 +90,29 @@ public class Window {
 		dt = now - then;
 		then = now;
 		
-		if (Keyboard.isKeyDown(GLFW_KEY_ESCAPE)) {
+		checkKeys();
+	}
+	
+	private static void checkKeys() {
+		if (Keyboard.keyHeldDown(GLFW_KEY_ESCAPE)) {
 			Cursor.setVisibility(true);
 		}
 		
-		if(Keyboard.isKeyPressed(GLFW_KEY_T)) {
+		if(Keyboard.keyHeldDown(GLFW_KEY_T)) {
 			System.out.println(glfwGetTime());
 		}
 		
-		if(Keyboard.isKeyPressed(GLFW_KEY_SPACE)) {
+		if(Keyboard.keyHeldDown(GLFW_KEY_SPACE)) {
 			System.out.println("FPS: " + 1 / Window.getDT());
 		}
 	}
 	
 	public static void clear() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+	
+	public static void close() {
+		glfwSetWindowShouldClose(windowID, true);
 	}
 	
 	public static boolean shouldClose() {

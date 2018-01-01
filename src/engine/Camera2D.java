@@ -34,8 +34,8 @@ public class Camera2D implements Camera {
 	
 	private Shader activeShader;
 	
-	public Camera2D(Shader shader) {
-		activeShader = shader;
+	public Camera2D(Quad quad) {
+		activeShader = quad.getShader();
 	}
 
 	public void update() {
@@ -44,36 +44,39 @@ public class Camera2D implements Camera {
 		currMoveSpeed *= multiplySpeed(ctrlMultiplier, shiftMultiplier);
 		currZoomSpeed = (float) (zoomSpeed * Window.getDT());
 		
-		if (Keyboard.isKeyPressed(GLFW_KEY_UP)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_UP)) {
 			zoomExponent += currZoomSpeed;
 		}
-		if (Keyboard.isKeyPressed(GLFW_KEY_DOWN)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_DOWN)) {
 			zoomExponent -= currZoomSpeed;
 		}
 		
-		if (Keyboard.isKeyPressed(GLFW_KEY_W)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_W)) {
 			Vector2f offset = new Vector2f(0.0f, currMoveSpeed);
 			pos.add(offset);
 		}
-		if (Keyboard.isKeyPressed(GLFW_KEY_S)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_S)) {
 			Vector2f offset = new Vector2f(0.0f, currMoveSpeed);
 			pos.sub(offset);
 		}
-		if (Keyboard.isKeyPressed(GLFW_KEY_A)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_A)) {
 			Vector2f offset = new Vector2f(currMoveSpeed, 0.0f);
 			pos.sub(offset);
 		}
-		if (Keyboard.isKeyPressed(GLFW_KEY_D)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_D)) {
 			Vector2f offset = new Vector2f(currMoveSpeed, 0.0f);
 			pos.add(offset);
 		}
 		
-		if (Keyboard.isKeyPressed(GLFW_KEY_LEFT_ALT)) {
+		if (Keyboard.keyHeldDown(GLFW_KEY_LEFT_ALT)) {
 			System.out.println("POS: " + (int)Math.floor(pos.x) + " " + (int)Math.floor(pos.y));
 		}
 		
 		zoom = 1/(float)Math.pow(2.0, zoomExponent);
+		
+		activeShader.enable();
 		activeShader.setUniform1f("iZoom", zoom);
 		activeShader.setUniform2f("iPosition", pos.x, pos.y);
+		activeShader.disable();
 	}	
 }

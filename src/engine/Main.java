@@ -23,17 +23,41 @@ import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public class Main {
-	public static void main(String[] args) {
-		
-		// For now just flips between general/tup3D rendering
-		boolean general = false;
-		
-		if (general) {
-			General gen = new General();
-			gen.run();
-		} else {
-			Tup3D tup = new Tup3D();
-			tup.run();
-		}
+	
+	private static int index = 0;
+	
+	private static App activeApp;
+	private static String pkgDir = "src/apps";
+	private static List<Class> apps = new ArrayList<>();
+	
+	public static void main(String[] args) {		
+		setupApps();
+		runNextApp();
 	}
+	
+	public static void runNextApp() {
+		index = (index + 1) % apps.size();
+		try {
+			activeApp = (App)apps.get(index).newInstance();
+			activeApp.run();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
+	}
+	
+	private static void setupApps() {
+		File appDir = new File(pkgDir);
+		File[] appFiles = appDir.listFiles((d, name) -> name.endsWith(".java"));
+		
+		for(File app : appFiles) {
+			try {
+				String pkgName = pkgDir.substring(pkgDir.lastIndexOf('/')+1);
+				String fileName = app.getName();
+				String className = pkgName + "." + fileName.substring(0, fileName.lastIndexOf('.'));
+				apps.add(Class.forName(className));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}	
 }
