@@ -14,15 +14,25 @@ const int ITERATIONS = 128;
 
 vec3 CSize;
 
+float box_sdf(vec3 p, vec3 b) {
+	vec3 q = abs(p) - b;
+	return length(max(q, 0)) + min(max(q.x, max(q.y, q.z)), 0);
+}
+
 float DE(vec3 p) {
+	
+	float s = 100;
+	p /= s;
+	p -= vec3(0,1,0);
+	vec3 pp = p;
 	CSize = vec3(1., 1., 1.3);
 	p = p.xzy;
 	float scale = 1.0;
-	for(int i = 0; i < 20; i++)
+	for(int i = 0; i < 3; i++)
 	{
 		p = 2.0*clamp(p, -CSize, CSize) - p;
 		//float r2 = dot(p,p);
-        float r2 = dot(p,p+sin(p.z*.3));
+        float r2 = dot(p,p+sin(p.z*0.01)); // should be .3
 		float k = max((2.)/(r2), .027);
 		p     *= k;
 		scale *= k;
@@ -31,15 +41,18 @@ float DE(vec3 p) {
 	float rxy = l - 4.0;
 	float n = l * p.z;
 	rxy = max(rxy, -(n) / 4.);
-	return (rxy) / abs(scale);
+	float res = (rxy) / abs(scale);
+	//res *= s;
+	
+	return max(res, box_sdf(pp+vec3(0,3,0), vec3(3,2,3))) * s;
 }
 
 float march(vec3 origin, vec3 direction, float nearClipDist) {
 	float depth = nearClipDist;
 	int steps;
 	for (steps = 0; steps < ITERATIONS; steps++) {
-		float dist = DE(origin + depth * direction);	
-		float epsilon = depth * 0.001;
+		float dist = DE(origin + depth * direction);
+		float epsilon = depth * 0.00003;
 		
 		if(dist < epsilon) {
 			break;
@@ -61,6 +74,7 @@ void main() {
 	vec3 worldDir = (iViewMatrix * vec4(viewDir, 0.0)).xyz;
 
 	vec3 start = vec3(0.1, -1.0, 0.1);
+	start = vec3(0);
 	float dist = march(iPosition+start, worldDir, iNearClip);
 
 	color = vec4(vec3(dist), 1.0);

@@ -22,6 +22,10 @@ public class Keyboard implements GLFWKeyCallbackI{
 	
 	@Override
 	public void invoke(long window, int key, int scancode, int action, int mods) {
+		if (key < 0) {
+			return;
+		}
+		
 		if (action != GLFW_RELEASE && keys[key] == false) {
 			keysDown[key] = true;
 			keysUp[key] = false;

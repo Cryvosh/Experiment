@@ -2,7 +2,12 @@ package engine;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public interface Camera extends Entity {	
+public interface Camera extends Entity {
+	
+	public default void swapQuad(Quad quad) {
+		
+	}
+	
 	public default float multiplySpeed(float lower, float upper) {
 		if (Keyboard.keyHeldDown(GLFW_KEY_LEFT_SHIFT)) {
 			return upper;

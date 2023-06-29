@@ -18,7 +18,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
-
+import static org.lwjgl.opengl.GL43.GL_SHADER_STORAGE_BUFFER;
 import static org.lwjgl.system.MemoryStack.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
@@ -28,6 +28,7 @@ public class General implements App {
 	private Quad activeQuad;
 	
 	private int index = 0;
+	private int ssbo = 0;
 	private String[] shaders;
 	private String shaderDirectory = "shaders/frag/general";
 	
@@ -68,6 +69,7 @@ public class General implements App {
 	private void resetShader() {
 		System.out.println(shaders[index]);
 		entites.remove(activeCamera);
+		setupSSBO();
 		
 		glfwSetTime(0);
 		Shader shader = new Shader("shaders/vert/vertex.vert", shaderDirectory + "/" + shaders[index]);
@@ -81,12 +83,43 @@ public class General implements App {
 		}
 	}
 	
+	private void softResetShader() {
+		System.out.println(shaders[index]);
+		//entites.remove(activeCamera);
+		setupSSBO();
+		
+		glfwSetTime(0);
+		Shader shader = new Shader("shaders/vert/vertex.vert", shaderDirectory + "/" + shaders[index]);
+		
+		if (shader.targetDimension() == 2) {
+			activeQuad = new Quad(1.0f, 0, shader);
+			activeCamera.swapQuad(activeQuad);
+			//entites.add(activeCamera = new Camera2D(activeQuad));
+		} else {
+			activeQuad = new Quad(1.0f, 0, shader);
+			activeCamera.swapQuad(activeQuad);
+			//entites.remove(activeCamera);
+			//entites.add(activeCamera = new Camera3D(activeQuad, 120f));
+		}
+	}
+	
+	private void setupSSBO() {
+		ssbo = glGenBuffers();
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+		IntBuffer data = BufferUtils.createIntBuffer(1000000);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, data, GL_DYNAMIC_DRAW);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+	}
+	
 	private void checkKeys() {
 		if (Keyboard.keyPressed(GLFW_KEY_TAB)) {
 			nextShader();
 		}
 		if (Keyboard.keyPressed(GLFW_KEY_R)) {
 			resetShader();
+		}
+		if (Keyboard.keyPressed(GLFW_KEY_E)) {
+			softResetShader();
 		}
 	}
 	

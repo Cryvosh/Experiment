@@ -10,18 +10,21 @@ uniform float iNearClip;
 uniform vec2 iMouse;
 uniform float iVerticalFOV;
 
-const int ITERATIONS = 128;
+const int ITERATIONS = 1000;
 
 bool isprime(int n) {
 	if(n<=1) {
 		return false;
 	}
+	
 	if(n==2) {
 		return true;
 	}
+	
 	if(n%2 == 0) {
 		return false;
 	}
+	
 	for(int i = 3; i <= sqrt(n); i+=2) {
 		if(n % i == 0) {
 			return false;
@@ -31,47 +34,29 @@ bool isprime(int n) {
 	return true;
 }
 
-int index(vec3 p) {
-	int width = 25;
-	int depth = 25;
-	
-	int x = int(floor(p.x));
-	int y = int(floor(p.y));
-	int z = int(floor(p.z));
-	
-	if (x < 0 || y < 0 || z < 0) {
-		return -1;
-	}
-	if (x >= width || z >= depth) {
-		return -1;
-	}
-	
-	return (width*z + x) + (depth*width*y);
-}
-
-float DE_SPHERES(vec3 p) {
-	float instance = 1.0;
-	p += 0.5;
-	vec3 q = mod(p, instance) - 0.5*instance;
-	
-	return length(q);
-}
-
 float DE_PRIMES(vec3 p) {
-	if (isprime(index(p))) {	
-		vec3 q = floor(p)+0.5;
-		return abs(length(p-q)) - 0.25;
+
+	float size = 0.001;
+
+	float x = p.x - mod(p.x, size);
+	float y = p.y - mod(p.y, size);
+	float z = p.z - mod(p.z, size);
+	
+	//if (abs(y - (sin(100*x)*x*100 + cos(100*z)*y*100)/200) < size/2) {
+	if (abs(y - sqrt(x*x*0.1 + z*z*0.1)) < size/2) {
+		vec3 q = p-mod(p,size)+size/2;
+		return abs(length(p-q)) - size/4;
 	}
 	
-	return 0.5;
+	return size/4;
 }
 
-float march(vec3 origin, vec3 direction, float nearClipDist) {
+vec2 march(vec3 origin, vec3 direction, float nearClipDist) {
 	float depth = nearClipDist;
 	int steps;
 	for (steps = 0; steps < ITERATIONS; steps++) {
 		float dist = DE_PRIMES(origin + depth * direction);	
-		float epsilon = 0.01;
+		float epsilon = 0.000001;
 		
 		if(dist < epsilon) {
 			break;
@@ -79,7 +64,7 @@ float march(vec3 origin, vec3 direction, float nearClipDist) {
 			
 		depth += dist;
 	}
-	return 1.0 - float(steps) / ITERATIONS;
+	return vec2(1.0 - float(steps) / ITERATIONS, depth);
 }
 
 vec3 rayDirection(float fieldOfView, vec2 size, vec4 fragCoord) {
@@ -92,9 +77,9 @@ void main() {
 	vec3 viewDir = rayDirection(iVerticalFOV, iResolution.xy, gl_FragCoord);
 	vec3 worldDir = (iViewMatrix * vec4(viewDir, 0.0)).xyz;
 
-	float march = march(iPosition, worldDir, iNearClip);
+	vec2 march = march(iPosition, worldDir, iNearClip);
 	
-	float fog = 1.0 / (1.0 + march * march * 1/ITERATIONS * 0.001);
+	float fog = 1.0 / (1.0 + march.y * march.y * 1/ITERATIONS * 0.00001);
 
-	color = vec4(vec3(march*fog), 1.0);
+	color = vec4(vec3(march.x), 1.0);
 }

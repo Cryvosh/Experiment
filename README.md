@@ -29,6 +29,7 @@
 * Press `/~/tilde to cycle through apps
 * Hold LEFT_ALT to see integer camera coordinates
 * Press R to reset/reload current shader
+* Press E to do soft reset shader (camera stays put)
 * Hold T to see shader time
 * Hold SPACE to show FPS
 

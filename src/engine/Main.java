@@ -24,13 +24,13 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Main {
 	
-	private static int index = 0;
+	private static int index = 1;
 	
 	private static App activeApp;
 	private static String pkgDir = "src/apps";
 	private static List<Class> apps = new ArrayList<>();
 	
-	public static void main(String[] args) {		
+	public static void main(String[] args) {
 		setupApps();
 		runNextApp();
 	}

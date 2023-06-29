@@ -99,7 +99,7 @@ public class Shader {
 		glUniformMatrix4fv(getUniform(name), true, matrix.get(buffer));
 	}
 	
-	private int load(String vertPath, String fragPath) {		
+	private int load(String vertPath, String fragPath) {
 		
 		int vertShader = glCreateShader(GL_VERTEX_SHADER);
 		int fragShader = glCreateShader(GL_FRAGMENT_SHADER);

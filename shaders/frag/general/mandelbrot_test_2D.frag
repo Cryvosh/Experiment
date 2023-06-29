@@ -34,7 +34,7 @@ void main() {
 	int i;
 	vec2 z = c;
 	
-	for (i = 0; i<1000; i++) {
+	for (i = 0; i<10; i++) {
 		z = iterate(z) + c;
 		if(!inSet(z)) {
 			color = vec4(vec3(sin(i)+1.8), 1.0);

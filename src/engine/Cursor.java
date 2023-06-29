@@ -30,6 +30,11 @@ public class Cursor implements GLFWCursorPosCallbackI {
 	@Override
 	public void invoke(long window, double x, double y) {
 		
+		if(visible) {
+			moved = false;
+			return;
+		}
+		
 		if(!moved) {
 			lastX = x;
 			lastY = y;

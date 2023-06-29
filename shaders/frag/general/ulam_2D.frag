@@ -24,8 +24,9 @@ int spiralindex(int x, int y) {
 }
 
 int gridindex(int x, int y) {
-	int spread = 100;
-	int width = int(sin(iGlobalTime*0.5) * spread + spread+1);
+	int spread = 50;
+	//int width = int(sin(iGlobalTime*0.5) * spread + spread+1);
+	int width = 50;
 
 	if(x >= width || x < 0 || y < 0) {
 		return -1;
@@ -80,8 +81,15 @@ void main() {
 	int x = int(floor(c.x));
 	int y = int(floor(c.y));
 	
-	int index = spiralindex(x, y);
+	int index = gridindex(x, y);
 	
-	int isprime = int(isprime(index));
-	color = vec4(isprime, int(index==0), isprime, 1.0);
+	bool isprime = isprime(index);
+	
+	float black = 0.117647;
+	
+	if (isprime == true) {
+		color = vec4(0.784313, black, black, 1.0);
+	} else {
+		color = vec4(black, black, black, 1.0);
+	}
 }

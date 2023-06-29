@@ -33,8 +33,8 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Tup3D implements App {
 	
-	public Camera3D activeCamera;
 	public Shader tup3D;
+	public Camera3D activeCamera;
 	
 	private int width = 1000;
 	private float verticalFOV = 120f;
@@ -61,16 +61,10 @@ public class Tup3D implements App {
 		Thread inputThread = new Thread(reader);
 		inputThread.start();
 		
-		tup3D = new Shader("shaders/vert/vertex.vert", shaderDirectory + "/Tup3D.frag");
-		tup3D.enable();
-		tup3D.setUniform1i("WIDTH", width);
-		tup3D.disable();
-		quad3D.add(new Quad(1.0f, 0, tup3D));
-		
-		setupSSBO();
-		bufferN(n, 0);
-		
-		entities.add(activeCamera = new Camera3D(quad3D, verticalFOV));
+		//nFromFile("shaders/frag/Tup3D/Tup3D.frag");
+		nFromObj("appData/Tup3D/n.obj");
+		//nFromFile(defaultNPath);
+		resetMainQuad();
 		
 		while(!Window.shouldClose()) {
 			update();
@@ -83,9 +77,41 @@ public class Tup3D implements App {
 		}
 	}
 	
-	private void resetCamera() {
+	private void resetMainQuad() {
+		glfwSetTime(0);		
+		tup3D = new Shader("shaders/vert/vertex.vert", shaderDirectory + "/Tup3D.frag");
+		tup3D.enable();
+		tup3D.setUniform1i("WIDTH", width);
+		tup3D.disable();
+		quad3D.clear();
+		quad3D.add(new Quad(1.0f, 0, tup3D));
+		
+		entities.remove(activeCamera);		
+		entities.add(activeCamera = new Camera3D(quad3D, verticalFOV));
+		
+		setupSSBO();
+		bufferN(n, 0);
+	}
+	
+	private void resetQuads() {
+		glfwSetTime(0);
+		
+		tup3D = new Shader("shaders/vert/vertex.vert", shaderDirectory + "/Tup3D.frag");
+		tup3D.enable();
+		tup3D.setUniform1i("WIDTH", width);
+		tup3D.disable();
+		quad3D.clear();
+		quad3D.add(new Quad(1.0f, 0, tup3D));
+		
+		Vector3f pos = activeCamera.getPos();
+		
 		entities.remove(activeCamera);
 		entities.add(activeCamera = new Camera3D(quad3D, verticalFOV));
+		
+		activeCamera.setPos(pos);
+		
+		setupSSBO();
+		bufferN(n, 0);
 	}
 	
 	private void update() {
@@ -144,12 +170,12 @@ public class Tup3D implements App {
 		}
 		
 		if (Keyboard.keyPressed(GLFW_KEY_R)) {
-			resetCamera();
+			resetMainQuad();
 		}
 	}
 	
 	private void modifyN() {
-		Vector3f pos = activeCamera.pos;
+		Vector3f pos = activeCamera.getPos();
 		if(pos.z > width) {
 			pos.z = 0;
 			n = n.add(BigInteger.ONE);
@@ -214,10 +240,12 @@ public class Tup3D implements App {
 		data.put(ints);
 		data.flip();
 		
-		glBufferData(GL_SHADER_STORAGE_BUFFER, data, GL_STATIC_DRAW);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, data, GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, ssbo);
 		
 		tup3D.enable();
+		int maxY = (int)(((long)1<<32)/((long)width*(long)width));
+		tup3D.setUniform1i("maxY", maxY);
 		tup3D.setUniform1i("LENGTH", ints.length);
 		tup3D.disable();
 	}

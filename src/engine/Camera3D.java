@@ -29,14 +29,14 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class Camera3D implements Camera {
 	
 	private float pitch, yaw;
-	private float nearClip;
+	private float nearClip = 0;
 	
-	public Vector3f pos = new Vector3f(0.0f, 0.0f, 0.0f);
+	private Vector3f pos = new Vector3f(0.0f, 0.0f, 0.0f);
 	private Vector3f front = new Vector3f(0.0f, 0.0f, -1.0f);
 	
-	private Vector3f x = new Vector3f(1.0f, 0.0f, 0.0f);
-	private Vector3f y = new Vector3f(0.0f, 1.0f, 0.0f);
-	private Vector3f z = new Vector3f(0.0f, 0.0f, 1.0f);
+	private Vector3f unitX = new Vector3f(1.0f, 0.0f, 0.0f);
+	private Vector3f unitY = new Vector3f(0.0f, 1.0f, 0.0f);
+	private Vector3f unitZ = new Vector3f(0.0f, 0.0f, 1.0f);
 	
 	private float baseSpeed = 1.5f;
 	private float ctrlMultiplier = 0.1f;
@@ -57,12 +57,23 @@ public class Camera3D implements Camera {
 		}
 	}
 	
-	public Camera3D (Quad quad, float fov) {		
+	public Camera3D (Quad quad, float fov) {
 		shaders.add(quad.getShader());
 		
 		for(Shader shader: shaders) {
 			shader.enable();
 			shader.setUniform1f("iVerticalFOV", fov);
+			shader.disable();
+		}
+	}
+	
+	public void swapQuad(Quad quad) {
+		this.shaders = new ArrayList<>();
+		shaders.add(quad.getShader());
+		
+		for(Shader shader: shaders) {
+			shader.enable();
+			shader.setUniform1f("iVerticalFOV", 120f);
 			shader.disable();
 		}
 	}
@@ -87,38 +98,38 @@ public class Camera3D implements Camera {
 		}
 		if (Keyboard.keyHeldDown(GLFW_KEY_A)) {
 			Vector3f frontClone = new Vector3f(front);
-			Vector3f global_y = new Vector3f(y);
+			Vector3f global_y = new Vector3f(unitY);
 			pos.sub(((frontClone.cross(global_y)).normalize()).mul(currSpeed));
 		}
 		if (Keyboard.keyHeldDown(GLFW_KEY_D)) {
 			Vector3f frontClone = new Vector3f(front);
-			Vector3f global_y = new Vector3f(y);
+			Vector3f global_y = new Vector3f(unitY);
 			pos.add(((frontClone.cross(global_y)).normalize()).mul(currSpeed));
 		}
 		
 		// Global space movement
 		if (Keyboard.keyHeldDown(GLFW_KEY_H)) {
-			Vector3f global_x = new Vector3f(x);
+			Vector3f global_x = new Vector3f(unitX);
 			pos.add(global_x.mul(currSpeed));
 		}
 		if (Keyboard.keyHeldDown(GLFW_KEY_K)) {
-			Vector3f global_x = new Vector3f(x);
+			Vector3f global_x = new Vector3f(unitX);
 			pos.sub(global_x.mul(currSpeed));
 		}
 		if (Keyboard.keyHeldDown(GLFW_KEY_Y)) {
-			Vector3f global_y = new Vector3f(y);
+			Vector3f global_y = new Vector3f(unitY);
 			pos.add(global_y.mul(currSpeed));
 		}
 		if (Keyboard.keyHeldDown(GLFW_KEY_I)) {
-			Vector3f global_y = new Vector3f(y);
+			Vector3f global_y = new Vector3f(unitY);
 			pos.sub(global_y.mul(currSpeed));
 		}
 		if (Keyboard.keyHeldDown(GLFW_KEY_U)) {
-			Vector3f global_z = new Vector3f(z);
+			Vector3f global_z = new Vector3f(unitZ);
 			pos.add(global_z.mul(currSpeed));
 		}
 		if (Keyboard.keyHeldDown(GLFW_KEY_J)) {
-			Vector3f gloabl_z = new Vector3f(z);
+			Vector3f gloabl_z = new Vector3f(unitZ);
 			pos.sub(gloabl_z.mul(currSpeed));
 		}
 		
@@ -126,7 +137,7 @@ public class Camera3D implements Camera {
 			System.out.println("POS: " + (int)pos.x + " " + (int)pos.y + " " + (int)pos.z);
 		}
 		
-		Matrix4f view = new Matrix4f().lookAt(pos, front.add(pos), y);
+		Matrix4f view = new Matrix4f().lookAt(pos, front.add(pos), unitY);
 		
 		for(Shader shader: shaders) {
 			shader.enable();
@@ -134,6 +145,14 @@ public class Camera3D implements Camera {
 			shader.setUniform3f("iPosition", pos.x, pos.y, pos.z);
 			shader.disable();
 		}
+	}
+	
+	public Vector3f getPos() {
+		return this.pos;
+	}
+	
+	public void setPos(Vector3f pos) {
+		this.pos = pos;
 	}
 	
 	private void rotate(double dPitch, double dYaw) {
